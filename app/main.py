@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
+from urllib.parse import urlsplit
 from uuid import uuid4
 import secrets
 import time as time_module
@@ -198,7 +199,15 @@ def set_language(language: str, request: Request):
     if language not in SUPPORTED_LANGUAGES:
         raise HTTPException(status_code=404, detail="Unsupported language")
     referer = request.headers.get("referer", "/")
-    destination = referer if referer.startswith("/") and not referer.startswith("//") else "/"
+    parsed = urlsplit(referer)
+    if parsed.scheme in {"http", "https"} and parsed.hostname == request.url.hostname:
+        destination = parsed.path or "/"
+        if parsed.query:
+            destination += "?" + parsed.query
+    elif referer.startswith("/") and not referer.startswith("//"):
+        destination = referer
+    else:
+        destination = "/"
     response = RedirectResponse(destination, status_code=303)
     response.set_cookie(
         "my_hr_language", language, max_age=60 * 60 * 24 * 365,
