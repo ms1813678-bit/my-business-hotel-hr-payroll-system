@@ -633,6 +633,15 @@ ZH.update({
   "المسؤول:": "管理员："
 })
 
+
+EN.update({
+  "مثال: study": "Example: study"
+})
+
+ZH.update({
+  "مثال: study": "示例：study"
+})
+
 LANGUAGES = {"ar": "العربية", "en": "English", "zh": "中文"}
 
 def _translate_value(value: str, language: str) -> str:
