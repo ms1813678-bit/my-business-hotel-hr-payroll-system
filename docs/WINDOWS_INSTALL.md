@@ -4,7 +4,7 @@ This is the initial setup path for the local M.Y. Business Hotel HR application.
 
 ## Prerequisites
 1. Windows 10 or Windows 11.
-2. Python 3.11 or newer with the Python Launcher for Windows.
+2. Python 3.11 with the Python Launcher for Windows (the setup script invokes `py -3.11`).
 3. PostgreSQL 16 (or a compatible supported release), installed and running locally.
 4. A dedicated PostgreSQL database and database user with schema permissions.
 5. The project repository checked out locally.
