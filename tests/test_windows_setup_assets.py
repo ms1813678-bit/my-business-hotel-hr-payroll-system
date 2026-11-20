@@ -51,3 +51,8 @@ def test_monthly_reports_remain_manual_and_no_scheduled_report_task_is_installed
     assert "generated manually by the administrator" in setup
     assert "no automatic report email or scheduled report job" in docs.lower()
     assert "register_monthly_report_task.ps1" not in setup
+
+def test_windows_setup_rejects_non_local_database_hosts():
+    setup = (ROOT / "scripts" / "windows" / "setup.ps1").read_text(encoding="utf-8")
+    assert '$DbHost -notin @("127.0.0.1", "localhost", "::1")' in setup
+    assert "PostgreSQL must run on this computer." in setup

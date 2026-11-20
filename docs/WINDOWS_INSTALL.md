@@ -6,7 +6,7 @@ This is the initial setup path for the local M.Y. Business Hotel HR application.
 1. Windows 10 or Windows 11.
 2. Python 3.11 with the Python Launcher for Windows (the setup script invokes `py -3.11`).
 3. PostgreSQL 16 (or a compatible supported release), installed and running locally.
-4. A dedicated PostgreSQL database and database user with schema permissions.
+4. A dedicated PostgreSQL database and database user with schema permissions, bound to this computer only (`localhost`, `127.0.0.1`, or `::1`). Remote database hosts are rejected.
 5. The project repository checked out locally.
 
 Do not use a production database until the complete application, security, backup, and restore tests are approved.
@@ -18,7 +18,7 @@ Do not use a production database until the complete application, security, backu
    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
    .\scripts\windows\setup.ps1
 4. Setup creates a project-local virtual environment and installs dependencies.
-5. Enter PostgreSQL connection details; the password is requested as hidden input.
+5. Enter PostgreSQL connection details; the password is requested as hidden input. The setup accepts loopback database hosts only and rejects remote database servers.
 6. Setup writes .env only when it does not already exist.
 7. Setup applies migrations, seeds missing standard departments and configured shift patterns, and creates the first administrator.
 8. A desktop shortcut named M.Y. Business Hotel HR is created after successful setup.
