@@ -1,5 +1,6 @@
 import re
 from datetime import date, timedelta
+from html.parser import HTMLParser
 from decimal import Decimal
 
 import pytest
@@ -13,6 +14,34 @@ from app.db import Base, get_db
 from app.main import app
 from app.models import AdminAccount, Department, Employee, EmployeeCodeCounter
 from app.security import hash_password
+
+
+class _ArabicUiTextProbe(HTMLParser):
+    _SKIP_TAGS = {"script", "style", "textarea", "pre", "code"}
+    _ARABIC = re.compile(r"[\u0600-\u06FF]")
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.skip_stack = []
+        self.arabic_parts = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag in self._SKIP_TAGS:
+            self.skip_stack.append(tag)
+        for name, value in attrs:
+            if name.lower() in {"placeholder", "title", "aria-label", "alt"} and value:
+                if self._ARABIC.search(value):
+                    self.arabic_parts.append(f"{name}={value}")
+
+    def handle_endtag(self, tag):
+        if tag in self._SKIP_TAGS and self.skip_stack and self.skip_stack[-1] == tag:
+            self.skip_stack.pop()
+
+    def handle_data(self, data):
+        if not self.skip_stack and self._ARABIC.search(data):
+            value = data.strip()
+            if value:
+                self.arabic_parts.append(value)
 
 
 @pytest.fixture()
@@ -1724,7 +1753,7 @@ def test_all_main_html_pages_render_in_each_supported_language(
         "/", "/ai", "/security-roster", "/attendance/import",
         "/attendance/reconcile", "/attendance/review", "/attendance/months",
         "/leave", "/advances", "/staff-actions", "/payroll", "/reports",
-        "/settings/backup", "/employees",
+        "/settings/backup", "/employees", "/login",
     ]
     for path in paths:
         response = client.get(path, headers={"accept": "text/html"})
@@ -1732,3 +1761,12 @@ def test_all_main_html_pages_render_in_each_supported_language(
         assert response.headers["content-language"] == content_language
         assert f'<html lang="{html_lang}" dir="{direction}">' in response.text
         assert navigation_label in response.text, f"Missing translated navigation on {path}"
+        if language != "ar":
+            probe = _ArabicUiTextProbe()
+            probe.feed(response.text)
+            assert not probe.arabic_parts, (
+                f"Untranslated Arabic UI content for {language} on {path}: "
+                f"{probe.arabic_parts[:8]}"
+            )
+        assert 'href="/settings/backup"' in response.text
+        assert 'href="/backup"' not in response.text

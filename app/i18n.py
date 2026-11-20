@@ -573,6 +573,42 @@ ZH.update({
   "تسجيل «تم إطلاع الموظف» هو توثيق إداري بواسطة مسؤول الموارد البشرية بعد إطلاع الموظف أو توقيعه على المستند الورقي. هذا الإجراء ليس توقيعًا إلكترونيًا من الموظف؛ لا توجد حسابات دخول للموظفين في النظام الحالي. القيم المالية المعتمدة ستُربط بالرواتب عند اكتمال وحدة الرواتب.": "记录“已告知员工”是人力资源管理员在告知员工相关事项或员工签署纸质文件后所做的管理记录。此操作不是员工的电子签名；当前系统不设员工登录账户。经批准的财务金额将在薪资模块完成后与工资关联。"
 })
 
+EN.update({
+  "مساعد الموارد البشرية المحلي — M.Y. Business Hotel HR": "Local HR Assistant — M.Y. Business Hotel HR",
+  "نظام الموارد البشرية — فندق M.Y. Business": "HR System — M.Y. Business Hotel",
+  "السلف | M.Y. Business Hotel": "Advances | M.Y. Business Hotel",
+  "النسخ الاحتياطي والاستعادة | M.Y. Business Hotel": "Backup & Restore | M.Y. Business Hotel",
+  "إدارة الإجازات | M.Y. Business Hotel": "Leave Management | M.Y. Business Hotel",
+  "إدارة الرواتب | M.Y. Business Hotel": "Payroll Management | M.Y. Business Hotel",
+  "مسير الرواتب | M.Y. Business Hotel": "Payroll Run | M.Y. Business Hotel",
+  "التقارير | M.Y. Business Hotel": "Reports | M.Y. Business Hotel",
+  "الجزاءات والمكافآت | M.Y. Business Hotel": "Sanctions & Rewards | M.Y. Business Hotel",
+  "المساعد جاهز": "Assistant Ready",
+  "المساعد غير متاح": "Assistant Unavailable",
+  "المساعد المحلي جاهز.": "The local assistant is ready.",
+  "خادم الذكاء المحلي يعمل، لكن النموذج المطلوب غير مثبت.": "The local AI server is running, but the required model is not installed.",
+  "المساعد المحلي غير متاح حاليًا. النظام الأساسي يعمل بشكل طبيعي.": "The local assistant is currently unavailable. Core system functions remain operational.",
+  "الاتصال بالنموذج مسموح فقط على الجهاز المحلي.": "Connections to the model are permitted only on this local device."
+})
+
+ZH.update({
+  "مساعد الموارد البشرية المحلي — M.Y. Business Hotel HR": "本地人力资源助手 — M.Y. Business Hotel HR",
+  "نظام الموارد البشرية — فندق M.Y. Business": "人力资源系统 — M.Y. Business 酒店",
+  "السلف | M.Y. Business Hotel": "预支工资 | M.Y. Business 酒店",
+  "النسخ الاحتياطي والاستعادة | M.Y. Business Hotel": "备份与恢复 | M.Y. Business 酒店",
+  "إدارة الإجازات | M.Y. Business Hotel": "休假管理 | M.Y. Business 酒店",
+  "إدارة الرواتب | M.Y. Business Hotel": "薪资管理 | M.Y. Business 酒店",
+  "مسير الرواتب | M.Y. Business Hotel": "工资批次 | M.Y. Business 酒店",
+  "التقارير | M.Y. Business Hotel": "报表 | M.Y. Business 酒店",
+  "الجزاءات والمكافآت | M.Y. Business Hotel": "奖惩管理 | M.Y. Business 酒店",
+  "المساعد جاهز": "助手已就绪",
+  "المساعد غير متاح": "助手不可用",
+  "المساعد المحلي جاهز.": "本地助手已就绪。",
+  "خادم الذكاء المحلي يعمل، لكن النموذج المطلوب غير مثبت.": "本地 AI 服务正在运行，但尚未安装所需模型。",
+  "المساعد المحلي غير متاح حاليًا. النظام الأساسي يعمل بشكل طبيعي.": "本地助手目前不可用，系统的核心功能仍可正常运行。",
+  "الاتصال بالنموذج مسموح فقط على الجهاز المحلي.": "仅允许连接本机上的模型。"
+})
+
 LANGUAGES = {"ar": "العربية", "en": "English", "zh": "中文"}
 
 def _translate_value(value: str, language: str) -> str:
