@@ -622,6 +622,17 @@ ZH.update({
   "مثال: نفذ: اعتمد مسير الرواتب رقم 3": "示例：执行：批准第 3 号工资批次"
 })
 
+
+EN.update({
+  "اعتماد شهور الحضور": "Attendance Month Approval",
+  "المسؤول:": "Administrator:"
+})
+
+ZH.update({
+  "اعتماد شهور الحضور": "考勤月份审批",
+  "المسؤول:": "管理员："
+})
+
 LANGUAGES = {"ar": "العربية", "en": "English", "zh": "中文"}
 
 def _translate_value(value: str, language: str) -> str:
