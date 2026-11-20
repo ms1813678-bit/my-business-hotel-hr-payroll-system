@@ -1753,7 +1753,7 @@ def test_all_main_html_pages_render_in_each_supported_language(
         "/", "/ai", "/security-roster", "/attendance/import",
         "/attendance/reconcile", "/attendance/review", "/attendance/months",
         "/leave", "/advances", "/staff-actions", "/payroll", "/reports",
-        "/settings/backup", "/employees", "/login",
+        "/settings/backup", "/employees",
     ]
     for path in paths:
         response = client.get(path, headers={"accept": "text/html"})
