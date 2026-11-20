@@ -180,8 +180,17 @@ async def language_middleware(request: Request, call_next):
     request.state.language = language
     response = await call_next(request)
     content_type = response.headers.get("content-type", "")
-    if content_type.lower().startswith("text/html") and hasattr(response, "body"):
-        body = translate_html(response.body.decode("utf-8"), language).encode("utf-8")
+    if content_type.lower().startswith("text/html"):
+        if hasattr(response, "body"):
+            body = response.body
+        elif hasattr(response, "body_iterator"):
+            chunks = []
+            async for chunk in response.body_iterator:
+                chunks.append(chunk.encode("utf-8") if isinstance(chunk, str) else chunk)
+            body = b"".join(chunks)
+        else:
+            body = b""
+        body = translate_html(body.decode("utf-8"), language).encode("utf-8")
         headers = dict(response.headers)
         headers.pop("content-length", None)
         headers["content-language"] = {"ar": "ar", "en": "en", "zh": "zh-CN"}[language]
