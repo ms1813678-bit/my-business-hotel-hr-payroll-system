@@ -1635,3 +1635,40 @@ def test_overnight_attendance_review_prefills_clock_out_on_next_date(client):
     page = client.get("/attendance/review")
     assert page.status_code == 200
     assert 'value="2026-11-02T07:03"' in page.text
+
+
+def test_language_switch_persists_and_renders_chinese_ltr(client):
+    response = client.get("/language/zh", follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers["location"] == "/"
+    cookie = response.headers["set-cookie"].lower()
+    assert "my_hr_language=zh" in cookie
+    assert "max-age=31536000" in cookie
+    assert "httponly" in cookie
+    assert "samesite=lax" in cookie
+
+    page = client.get("/login")
+    assert page.status_code == 200
+    assert page.headers["content-language"] == "zh-CN"
+    assert '<html lang="zh-CN" dir="ltr">' in page.text
+    assert "管理员登录" in page.text
+
+
+def test_language_switch_supports_english_and_arabic_default(client):
+    english = client.get("/language/en", follow_redirects=False)
+    assert english.status_code == 303
+    page = client.get("/login")
+    assert page.headers["content-language"] == "en"
+    assert '<html lang="en" dir="ltr">' in page.text
+    assert "Administrator Sign In" in page.text
+
+    client.cookies.delete("my_hr_language")
+    arabic = client.get("/login")
+    assert arabic.headers["content-language"] == "ar"
+    assert '<html lang="ar" dir="rtl">' in arabic.text
+    assert "تسجيل دخول الإدارة" in arabic.text
+
+
+def test_language_switch_rejects_unsupported_locale(client):
+    response = client.get("/language/fr", follow_redirects=False)
+    assert response.status_code == 404
