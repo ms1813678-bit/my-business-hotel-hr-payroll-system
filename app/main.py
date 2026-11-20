@@ -167,6 +167,47 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
+from app.i18n import translate_html
+
+@app.middleware("http")
+async def language_middleware(request: Request, call_next):
+    language = request.cookies.get("my_hr_language", "ar")
+    if language not in {"ar", "en"}:
+        language = "ar"
+    request.state.language = language
+    response = await call_next(request)
+    if response.media_type == "text/html" and hasattr(response, "body"):
+        body = response.body
+        if language == "en":
+            body = translate_html(body.decode("utf-8")).encode("utf-8")
+        headers = dict(response.headers)
+        headers.pop("content-length", None)
+        headers["content-language"] = language
+        response = Response(
+            content=body,
+            status_code=response.status_code,
+            headers=headers,
+            media_type="text/html",
+            background=response.background,
+        )
+    return response
+
+
+@app.get("/language/{language}")
+def set_language(language: str, request: Request):
+    if language not in {"ar", "en"}:
+        raise HTTPException(status_code=404, detail="Unsupported language")
+    referer = request.headers.get("referer", "/")
+    destination = referer if referer.startswith("/") and not referer.startswith("//") else "/"
+    response = RedirectResponse(destination, status_code=303)
+    response.set_cookie(
+        "my_hr_language", language, max_age=60 * 60 * 24 * 365,
+        httponly=True, secure=settings.app_env.lower() == "production",
+        samesite="lax", path="/",
+    )
+    return response
+
+
 
 @app.exception_handler(HTTPException)
 async def authentication_exception_handler(request: Request, exc: HTTPException):
