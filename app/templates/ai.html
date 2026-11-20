@@ -14,7 +14,7 @@
     <section class="ai-status {{ 'ai-ready' if status.available else 'ai-offline' }}">
       <div>
         <strong>{{ status.message }}</strong>
-        <p class="muted">النموذج: {{ status.model }} — الاتصال بالنموذج مقصور على الجهاز المحلي.</p>
+        <p class="muted"><span>النموذج:</span> <bdi>{{ status.model }}</bdi> <span>— الاتصال بالنموذج مقصور على الجهاز المحلي.</span></p>
       </div>
     </section>
 

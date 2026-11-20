@@ -1,5 +1,6 @@
 import re
 from datetime import date, timedelta
+from html.parser import HTMLParser
 from decimal import Decimal
 
 import pytest
@@ -13,6 +14,34 @@ from app.db import Base, get_db
 from app.main import app
 from app.models import AdminAccount, Department, Employee, EmployeeCodeCounter
 from app.security import hash_password
+
+
+class _ArabicUiTextProbe(HTMLParser):
+    _SKIP_TAGS = {"script", "style", "textarea", "pre", "code"}
+    _ARABIC = re.compile(r"[\u0600-\u06FF]")
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.skip_stack = []
+        self.arabic_parts = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag in self._SKIP_TAGS:
+            self.skip_stack.append(tag)
+        for name, value in attrs:
+            if name.lower() in {"placeholder", "title", "aria-label", "alt"} and value:
+                if self._ARABIC.search(value):
+                    self.arabic_parts.append(f"{name}={value}")
+
+    def handle_endtag(self, tag):
+        if tag in self._SKIP_TAGS and self.skip_stack and self.skip_stack[-1] == tag:
+            self.skip_stack.pop()
+
+    def handle_data(self, data):
+        if not self.skip_stack and self._ARABIC.search(data):
+            value = data.strip()
+            if value:
+                self.arabic_parts.append(value)
 
 
 @pytest.fixture()
@@ -592,6 +621,54 @@ def test_employee_profile_edit_records_effective_dated_history_and_audit(client)
         assert all(change.old_value is not None and change.new_value is not None for change in changes)
         assert audit.actor == "integration-admin"
         assert "Approved employee data correction" == audit.reason
+
+
+def test_employee_profile_edit_rejects_future_effective_date(client):
+    from app.main import SessionLocal
+    from app.models import EmployeeChange
+
+    assert login(client).status_code == 303
+    with SessionLocal.begin() as db:
+        employee = Employee(
+            code="MY-FUTURE-EFFECTIVE-01",
+            full_name="Future Effective Test",
+            department_id=client.test_department_id,
+            position="Test Position",
+            hire_date=date(2024, 1, 1),
+            status="active",
+            basic_salary=Decimal("5000.00"),
+            daily_hours=Decimal("8.00"),
+        )
+        db.add(employee)
+        db.flush()
+        employee_id = employee.id
+
+    token = csrf_from(client.get("/employees"))
+    response = client.post(
+        f"/employees/{employee_id}/edit",
+        data={
+            "csrf_token": token,
+            "full_name": "Future Effective Test Updated",
+            "national_id": "",
+            "phone": "",
+            "address": "",
+            "department_id": str(client.test_department_id),
+            "branch_id": "",
+            "position": "Test Position",
+            "basic_salary": "7000.00",
+            "daily_hours": "8.00",
+            "fingerprint_id": "",
+            "effective_date": "2099-01-01",
+            "reason": "Future date must not change current employee values early",
+        },
+        follow_redirects=False,
+    )
+    assert response.status_code == 400
+    with SessionLocal() as db:
+        employee = db.get(Employee, employee_id)
+        assert employee.basic_salary == Decimal("5000.00")
+        assert employee.full_name == "Future Effective Test"
+        assert db.query(EmployeeChange).filter_by(employee_id=employee_id).count() == 0
 
 
 def test_employee_edit_rejects_branch_from_another_department(client):
@@ -1635,3 +1712,112 @@ def test_overnight_attendance_review_prefills_clock_out_on_next_date(client):
     page = client.get("/attendance/review")
     assert page.status_code == 200
     assert 'value="2026-11-02T07:03"' in page.text
+
+
+def test_language_switch_persists_and_renders_chinese_ltr(client):
+    response = client.get("/language/zh", follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers["location"] == "/"
+    cookie = response.headers["set-cookie"].lower()
+    assert "my_hr_language=zh" in cookie
+    assert "max-age=31536000" in cookie
+    assert "httponly" in cookie
+    assert "samesite=lax" in cookie
+
+    page = client.get("/login")
+    assert page.status_code == 200
+    assert page.headers["content-language"] == "zh-CN"
+    assert '<html lang="zh-CN" dir="ltr">' in page.text
+    assert "管理员登录" in page.text
+
+
+def test_language_switch_supports_english_and_arabic_default(client):
+    english = client.get("/language/en", follow_redirects=False)
+    assert english.status_code == 303
+    page = client.get("/login")
+    assert page.headers["content-language"] == "en"
+    assert '<html lang="en" dir="ltr">' in page.text
+    assert "Administrator Sign In" in page.text
+
+    client.cookies.delete("my_hr_language")
+    arabic = client.get("/login")
+    assert arabic.headers["content-language"] == "ar"
+    assert '<html lang="ar" dir="rtl">' in arabic.text
+    assert "تسجيل دخول الإدارة" in arabic.text
+
+
+def test_language_switch_rejects_unsupported_locale(client):
+    response = client.get("/language/fr", follow_redirects=False)
+    assert response.status_code == 404
+
+
+def test_login_post_and_csrf_continue_to_work_after_language_switch(client):
+    client.get("/language/en", follow_redirects=False)
+    page = client.get("/login")
+    assert page.headers["content-language"] == "en"
+    token = csrf_from(page)
+    response = client.post(
+        "/login",
+        data={
+            "username": "integration-admin",
+            "password": "Integration-Test-Password-123!",
+            "csrf_token": token,
+        },
+        follow_redirects=False,
+    )
+    assert response.status_code == 303
+    dashboard = client.get("/")
+    assert dashboard.status_code == 200
+    assert dashboard.headers["content-language"] == "en"
+    assert "Dashboard" in dashboard.text
+
+
+def test_language_switch_keeps_safe_same_origin_page_and_query(client):
+    response = client.get(
+        "/language/zh",
+        headers={"referer": "http://testserver/login?from=language"},
+        follow_redirects=False,
+    )
+    assert response.status_code == 303
+    assert response.headers["location"] == "/login?from=language"
+
+
+
+@pytest.mark.parametrize(
+    ("language", "html_lang", "direction", "content_language", "navigation_label"),
+    [
+        ("ar", "ar", "rtl", "ar", "لوحة التحكم"),
+        ("en", "en", "ltr", "en", "Dashboard"),
+        ("zh", "zh-CN", "ltr", "zh-CN", "控制面板"),
+    ],
+)
+def test_all_main_html_pages_render_in_each_supported_language(
+    client, language, html_lang, direction, content_language, navigation_label
+):
+    assert login(client).status_code == 303
+    client.cookies.set("my_hr_language", language)
+
+    paths = [
+        "/", "/ai", "/security-roster", "/attendance/import",
+        "/attendance/reconcile", "/attendance/review", "/attendance/months",
+        "/leave", "/advances", "/staff-actions", "/payroll", "/reports",
+        "/settings/backup", "/employees",
+    ]
+    for path in paths:
+        response = client.get(path, headers={"accept": "text/html"})
+        assert response.status_code == 200, f"{language} {path}: {response.status_code}"
+        assert response.headers["content-language"] == content_language
+        assert f'<html lang="{html_lang}" dir="{direction}">' in response.text
+        assert navigation_label in response.text, f"Missing translated navigation on {path}"
+        if path == "/" and language != "ar":
+            expected_greeting = "Welcome," if language == "en" else "欢迎，"
+            assert expected_greeting in response.text
+        if language != "ar":
+            probe = _ArabicUiTextProbe()
+            probe.feed(response.text)
+            assert not probe.arabic_parts, (
+                f"Untranslated Arabic UI content for {language} on {path}: "
+                f"{probe.arabic_parts[:8]}"
+            )
+        assert 'href="/settings/backup"' in response.text
+        assert 'href="/backup"' not in response.text

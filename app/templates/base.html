@@ -13,6 +13,7 @@
 <body>
   <div class="app-layout">
     <aside class="sidebar">
+      <nav class="language-switch" aria-label="Language"><a href="/language/ar">العربية</a><a href="/language/en">English</a><a href="/language/zh">中文</a></nav>
       <div class="sidebar-brand">
         <div class="brand-row">
           <span class="mark">MY</span>
@@ -47,7 +48,7 @@
 
       <div class="nav-group">
         <div class="nav-group-title">النظام</div>
-        <a class="nav-link {% if active_nav == 'backup' %}active{% endif %}" href="/backup"><span class="dot"></span>النسخ الاحتياطي</a>
+        <a class="nav-link {% if active_nav == 'backup' %}active{% endif %}" href="/settings/backup"><span class="dot"></span>النسخ الاحتياطي</a>
       </div>
     </aside>
 

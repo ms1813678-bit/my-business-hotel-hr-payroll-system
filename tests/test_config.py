@@ -25,3 +25,18 @@ def test_database_url_accepts_explicit_postgres():
 def test_session_secret_rejects_missing_short_or_placeholder(secret):
     with pytest.raises(ValidationError):
         build(session_secret=secret)
+
+@pytest.mark.parametrize(
+    "host",
+    ["192.168.1.20", "10.0.0.5", "db.hotel.local", "example.com"],
+)
+def test_database_url_rejects_remote_postgres_hosts(host):
+    with pytest.raises(ValidationError, match="on this computer only"):
+        build(database_url=f"postgresql+psycopg://test_user:test_password@{host}:5432/test_db")
+
+
+@pytest.mark.parametrize("host", ["localhost", "127.0.0.1", "[::1]"])
+def test_database_url_accepts_loopback_postgres_hosts(host):
+    assert build(
+        database_url=f"postgresql+psycopg://test_user:test_password@{host}:5432/test_db"
+    ).database_url.startswith("postgresql+psycopg://")

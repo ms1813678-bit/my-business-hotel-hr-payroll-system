@@ -1,16 +1,16 @@
 # Project specification — M.Y. Business Hotel HR System
 
 ## Product goal
-A local-first Arabic/English HR and payroll application for M.Y. Business Hotel, Maadi, Cairo. The system is operated by one authorized administrator: the HR Manager. It is not a public website and must not expose its local service to the public internet.
+A local-only Arabic / English / Simplified Chinese HR and payroll application for M.Y. Business Hotel, Maadi, Cairo. The system is operated by one authorized administrator: the HR Manager. It is not a public website and must not expose its local service to the public internet.
 
 ## Runtime and architecture
 - Target: Windows 10 or Windows 11 laptop, 16 GB RAM recommended, approximately 500 GB storage.
 - Local web application with PostgreSQL as the database and local file storage.
 - Manual launch from a desktop shortcut; do not auto-start with Windows.
-- Arabic is the default language; support English, RTL/LTR, Africa/Cairo timezone, DD/MM/YYYY, 24-hour time, and EGP.
+- Arabic is the default language; support English and Simplified Chinese, RTL for Arabic and LTR for English/Chinese, Africa/Cairo timezone, DD/MM/YYYY, 24-hour time, and EGP.
 - Core functions must work offline. AI is optional and must not block normal operation.
 - Prefer a free local AI model. Do not use paid APIs, subscriptions, or external data services without explicit approval.
-- Keep the architecture migration-ready for a future cloud deployment without requiring hosting now.
+- No cloud hosting, cloud database, or external processing of hotel or employee data is in the current scope. Core HR and payroll functions must operate locally.
 
 ## Access and security
 - Exactly one login: System Administrator / HR Manager. No employee, supervisor, or department-manager accounts.

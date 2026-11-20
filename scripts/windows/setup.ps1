@@ -25,6 +25,11 @@ if (-not (Test-Path ".env")) {
     Write-Host "Enter PostgreSQL connection details." -ForegroundColor Yellow
     $DbHost = Read-Host "Database host (default 127.0.0.1)"
     if ([string]::IsNullOrWhiteSpace($DbHost)) { $DbHost = "127.0.0.1" }
+    $DbHost = $DbHost.Trim().Trim('[', ']').ToLowerInvariant()
+    if ($DbHost -notin @("127.0.0.1", "localhost", "::1")) {
+        throw "PostgreSQL must run on this computer. Use localhost, 127.0.0.1, or ::1."
+    }
+    if ($DbHost -eq "::1") { $DbHost = "[::1]" }
     $DbPortInput = Read-Host "Database port (default 5432)"
     if ([string]::IsNullOrWhiteSpace($DbPortInput)) { $DbPortInput = "5432" }
     $DbName = Read-Host "Database name"

@@ -3,25 +3,11 @@ name: Python test suite
 on:
   push:
     branches:
-      - feature/auth-security
-      - feature/platform-hardening
-      - work/leave-management-foundation
-      - work/rewards-sanctions-v2
-      - work/payroll-foundation
-      - work/backup-recovery-v2
-      - integration/release-hardening-v2
-      - integration/final-acceptance-v1
-      - feature/dashboard-ai-v1
+      - main
+      - feature/bilingual-ui-rtl-ltr
   pull_request:
     branches:
       - main
-      - feature/dashboard-ai-v1
-      - feature/auth-security
-      - work/leave-management-foundation
-      - work/rewards-sanctions-v2
-      - work/payroll-foundation
-      - work/backup-recovery-v2
-      - integration/final-acceptance-v1
   workflow_dispatch:
 
 permissions:

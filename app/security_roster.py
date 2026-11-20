@@ -1,11 +1,12 @@
-"""Build full-day security shift proposals from guards actually working that day.
+"""Build full-day security shift proposals using the active guard headcount.
 
-The Excel roster supplies each employee's shift START time or OFF. OFF is excluded
-before the model is chosen. Exactly two working guards use the approved 12-hour
-windows (08:00–20:00 and 20:00–08:00). More than two use the three approved
-8-hour windows (08:00–16:00, 16:00–00:00, 00:00–08:00). Several guards may share
-one start time. A day is ready for review only when every required window is
-covered and each one resolves to exactly one ShiftPattern. Nothing is persisted here.
+The Excel roster must contain every active security employee. Each employee is
+assigned a shift START time or OFF. Exactly two active guards use the approved
+12-hour windows (08:00–20:00 and 20:00–08:00). Three or more active guards use
+the three approved 8-hour windows (08:00–16:00, 16:00–00:00, 00:00–08:00).
+An OFF entry never changes the shift model. Every required window must remain
+covered before the day can be sent for administrator review. Several guards may
+share a window. Nothing is persisted here.
 """
 from datetime import time
 
@@ -41,10 +42,11 @@ def build_security_day_proposal(roster, shift_patterns):
     """Return a reviewable proposal for one date.
 
     roster maps every active employee ID to an HH:MM start time or "OFF".
-    The shift model follows the number of guards working after OFF is excluded,
-    not the size of the roster. Repeated start times are allowed. The work date
-    stays the date the shift starts; this function does not move overnight work
-    onto the next calendar day.
+    The shift model follows the full active roster size, including employees marked
+    OFF for this date. Exactly two active guards use 12-hour shifts; three or more
+    use 8-hour shifts. OFF does not reduce the active headcount or change the model.
+    Repeated start times are allowed. The work date stays the date the shift starts;
+    this function does not move overnight work onto the next calendar day.
     """
     if not isinstance(roster, dict) or len(roster) < 2:
         return _needs_review(["security_roster_requires_at_least_two_active_employees"])
@@ -69,7 +71,7 @@ def build_security_day_proposal(roster, shift_patterns):
     if len(working) < 2:
         return _needs_review(["daily_security_working_count_must_cover_full_day"])
 
-    if len(working) == 2:
+    if len(roster) == 2:
         windows = _TWELVE_HOUR_WINDOWS
         duration = 12
     else:

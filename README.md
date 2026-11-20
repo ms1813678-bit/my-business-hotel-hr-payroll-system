@@ -7,7 +7,7 @@ A local-first HR and payroll application for M.Y. Business Hotel, Maadi, Cairo. 
 **Feature-complete on the final-acceptance track for local testing — not yet production-accepted.**  
 Do **not** enter real employee or payroll data until Windows installation, backup/restore, and owner acceptance are completed. `main` remains unchanged until the owner explicitly approves a merge.
 
-### Verified on this integration branch
+### Verified on this acceptance branch
 
 - Single administrator authentication, session security, CSRF protection, and immutable audit history.
 - Employee register, department/branch assignment, non-reusable employee codes, archive/rehire history.
@@ -18,9 +18,10 @@ Do **not** enter real employee or payroll data until Windows installation, backu
 - Sanctions and rewards with manual amounts and payroll-month assignment.
 - Monthly payroll runs, snapshots, overtime approval gate, close/reopen, payment ledger.
 - Manual Excel/PDF reports with date range and employee scope; local file save only.
-- Local AI assistant as a **core product feature** (always present in the UI). If the local model is temporarily unavailable, core HR/payroll continues. Write actions require explicit administrator approval. Security roster vs fingerprint comparison is available as a read-only review report.
-- RTL Arabic admin UI shell with live dashboard metrics.
-- Final acceptance CI includes PostgreSQL 16 migration/concurrency tests and a Windows runner compatibility job; the latest result must be confirmed on the current commit before release.
+- PostgreSQL connection guard: application startup accepts loopback database hosts only (localhost, 127.0.0.1, ::1) and rejects remote database hosts.
+- Optional local AI assistant (available in the UI when enabled). If the local model is temporarily unavailable, core HR/payroll continues. Write actions require explicit administrator approval. Security roster vs fingerprint comparison is available as a read-only review report.
+- Arabic / English / Simplified Chinese UI with RTL Arabic and LTR English/Chinese layouts, plus live dashboard metrics.
+- Latest security validation on commit `eb027b46776461c4c1dc8e6bfea1199da083408a` completed successfully: Linux/PostgreSQL test suite 330 passed (16 warnings), Windows runner test suite 323 passed (1 warning), and all three PowerShell scripts passed syntax checks. [View workflow run](https://github.com/ms1813678-bit/my-business-hotel-hr-payroll-system/actions/runs/44737576171).
 
 ### Still required before production release
 
@@ -28,11 +29,11 @@ Do **not** enter real employee or payroll data until Windows installation, backu
 2. Full backup and restore verification on the target computer (including external drive if used).
 3. Windows 10/11 installation via `docs/WINDOWS_INSTALL.md` and `scripts/windows/setup.ps1` on the hotel PC.
 4. Owner end-to-end acceptance: attendance month → variable-size security roster → payroll → report with synthetic data only.
-5. Explicit owner approval to merge `integration/final-acceptance-v1` into `main`.
+5. Explicit owner approval to merge `feature/bilingual-ui-rtl-ltr` into `main` after all acceptance gates pass.
 
 ## Local Windows setup
 
-See docs/WINDOWS_INSTALL.md for the current installation path (Windows 10 and Windows 11). The application binds to 127.0.0.1 only and must not be exposed to the public internet.
+See docs/WINDOWS_INSTALL.md for the current installation path (Windows 10 and Windows 11), and docs/ACCEPTANCE_CHECKLIST_AR.md for the Arabic step-by-step acceptance record. The application binds to 127.0.0.1 only and must not be exposed to the public internet.
 
 ## Business rules and scope
 

@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
+from urllib.parse import urlsplit
 from uuid import uuid4
 import secrets
 import time as time_module
@@ -166,6 +167,65 @@ app.add_middleware(
 )
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
+
+from app.i18n import translate_html
+
+SUPPORTED_LANGUAGES = {"ar", "en", "zh"}
+
+@app.middleware("http")
+async def language_middleware(request: Request, call_next):
+    language = request.cookies.get("my_hr_language", "ar")
+    if language not in SUPPORTED_LANGUAGES:
+        language = "ar"
+    request.state.language = language
+    response = await call_next(request)
+    content_type = response.headers.get("content-type", "")
+    if content_type.lower().startswith("text/html"):
+        if hasattr(response, "body"):
+            body = response.body
+        elif hasattr(response, "body_iterator"):
+            chunks = []
+            async for chunk in response.body_iterator:
+                chunks.append(chunk.encode("utf-8") if isinstance(chunk, str) else chunk)
+            body = b"".join(chunks)
+        else:
+            body = b""
+        body = translate_html(body.decode("utf-8"), language).encode("utf-8")
+        headers = dict(response.headers)
+        headers.pop("content-length", None)
+        headers["content-language"] = {"ar": "ar", "en": "en", "zh": "zh-CN"}[language]
+        response = Response(
+            content=body,
+            status_code=response.status_code,
+            headers=headers,
+            media_type="text/html",
+            background=response.background,
+        )
+    return response
+
+
+@app.get("/language/{language}")
+def set_language(language: str, request: Request):
+    if language not in SUPPORTED_LANGUAGES:
+        raise HTTPException(status_code=404, detail="Unsupported language")
+    referer = request.headers.get("referer", "/")
+    parsed = urlsplit(referer)
+    if parsed.scheme in {"http", "https"} and parsed.hostname == request.url.hostname:
+        destination = parsed.path or "/"
+        if parsed.query:
+            destination += "?" + parsed.query
+    elif referer.startswith("/") and not referer.startswith("//"):
+        destination = referer
+    else:
+        destination = "/"
+    response = RedirectResponse(destination, status_code=303)
+    response.set_cookie(
+        "my_hr_language", language, max_age=60 * 60 * 24 * 365,
+        httponly=True, secure=settings.app_env.lower() == "production",
+        samesite="lax", path="/",
+    )
+    return response
+
 
 
 @app.exception_handler(HTTPException)
@@ -2273,6 +2333,11 @@ def edit_employee(
         raise HTTPException(status_code=400, detail="بيانات الراتب أو ساعات العمل غير صحيحة.")
     if probation_start_date and probation_end_date and probation_end_date < probation_start_date:
         raise HTTPException(status_code=400, detail="نهاية فترة الاختبار لا يمكن أن تسبق بدايتها.")
+    if effective_date > date.today():
+        raise HTTPException(
+            status_code=400,
+            detail="تاريخ سريان تعديل بيانات الموظف لا يمكن أن يكون في المستقبل.",
+        )
 
     with SessionLocal.begin() as db:
         employee = db.get(Employee, employee_id)
@@ -2445,6 +2510,11 @@ def transfer_employee(
     reason = reason.strip()
     if not reason:
         raise HTTPException(status_code=400, detail="سبب النقل مطلوب.")
+    if effective_date > date.today():
+        raise HTTPException(
+            status_code=400,
+            detail="تاريخ سريان نقل الموظف لا يمكن أن يكون في المستقبل.",
+        )
     with SessionLocal.begin() as db:
         employee = db.get(Employee, employee_id)
         if employee is None:
