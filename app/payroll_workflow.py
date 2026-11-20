@@ -12,7 +12,9 @@ from app.models import (
     AttendanceDailyRecord,
     AttendanceMonth,
     AuditLog,
+    Department,
     Employee,
+    EmployeeChange,
     EmployeeServicePeriod,
     PayrollItem,
     PayrollPayment,
@@ -72,6 +74,54 @@ def _active_days(periods: list[EmployeeServicePeriod], start: date, end: date) -
         for offset in range((period_end - period_start).days + 1):
             days.add(period_start.fromordinal(period_start.toordinal() + offset))
     return len(days)
+
+
+def _coerce_employee_history_value(field_name: str, value):
+    if value is None:
+        return None
+    if field_name in {"basic_salary", "daily_hours"}:
+        return Decimal(str(value))
+    if field_name in {"department_id", "branch_id"}:
+        return int(value)
+    return str(value)
+
+
+def _employee_snapshot_on_date(
+    db: Session,
+    employee: Employee,
+    effective_date: date,
+) -> tuple[dict, list[EmployeeChange]]:
+    """Resolve profile values as of a date by reversing later effective changes.
+
+    Employee rows hold the latest entered value. Payroll must not silently use a
+    later-effective salary, hours, department, position, or name for an earlier
+    month. Inconsistent/out-of-order audit history fails closed.
+    """
+    changes = db.scalars(
+        select(EmployeeChange)
+        .where(EmployeeChange.employee_id == employee.id)
+        .order_by(EmployeeChange.effective_date.desc(), EmployeeChange.id.desc())
+    ).all()
+    by_field: dict[str, list[EmployeeChange]] = {}
+    for change in changes:
+        by_field.setdefault(change.field_name, []).append(change)
+
+    snapshot = {}
+    for field_name in ("full_name", "department_id", "position", "basic_salary", "daily_hours"):
+        value = _coerce_employee_history_value(field_name, getattr(employee, field_name))
+        for change in by_field.get(field_name, []):
+            expected = _coerce_employee_history_value(field_name, change.new_value)
+            if value != expected:
+                raise ValueError(
+                    f"Employee #{employee.id} has inconsistent effective-date history for "
+                    f"{field_name}; reconcile the employee change history before payroll."
+                )
+            if change.effective_date > effective_date:
+                value = _coerce_employee_history_value(field_name, change.old_value)
+            else:
+                break
+        snapshot[field_name] = value
+    return snapshot, changes
 
 
 def _attendance_lateness(
@@ -227,8 +277,24 @@ def create_payroll_run(db: Session, *, year: int, month: int, actor: str) -> Pay
         employee = db.get(Employee, employee_id)
         if employee is None:
             continue
-        salary_basis = Decimal(employee.basic_salary)
-        daily_hours = Decimal(employee.daily_hours)
+        employee_snapshot, employee_changes = _employee_snapshot_on_date(db, employee, start)
+        mid_period_compensation_change = next(
+            (
+                change for change in employee_changes
+                if change.field_name in {"basic_salary", "daily_hours"}
+                and start < change.effective_date <= end
+            ),
+            None,
+        )
+        if mid_period_compensation_change is not None:
+            raise ValueError(
+                f"Employee #{employee.id} has a {mid_period_compensation_change.field_name} "
+                f"change effective on {mid_period_compensation_change.effective_date}. "
+                "Payroll is blocked because mid-month compensation proration requires an "
+                "explicit HR policy; no salary rate was guessed."
+            )
+        salary_basis = Decimal(employee_snapshot["basic_salary"])
+        daily_hours = Decimal(employee_snapshot["daily_hours"])
         payable_days = _active_days(periods, start, end)
         base_salary = money(salary_basis * Decimal(payable_days) / Decimal(days_in_month))
         attendance_records = db.scalars(
@@ -246,9 +312,14 @@ def create_payroll_run(db: Session, *, year: int, month: int, actor: str) -> Pay
             payroll_run_id=run.id,
             employee_id=employee_id,
             employee_code_snapshot=employee.code,
-            employee_name_snapshot=employee.full_name,
-            department_name_snapshot=employee.department.name if employee.department else "",
-            position_snapshot=employee.position,
+            employee_name_snapshot=employee_snapshot["full_name"],
+            department_name_snapshot=(
+                db.get(Department, employee_snapshot["department_id"]).name
+                if employee_snapshot["department_id"] is not None
+                and db.get(Department, employee_snapshot["department_id"]) is not None
+                else ""
+            ),
+            position_snapshot=employee_snapshot["position"],
             salary_basis=salary_basis,
             base_salary=base_salary,
             daily_hours=daily_hours,

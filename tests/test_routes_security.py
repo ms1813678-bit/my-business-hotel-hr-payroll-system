@@ -623,6 +623,54 @@ def test_employee_profile_edit_records_effective_dated_history_and_audit(client)
         assert "Approved employee data correction" == audit.reason
 
 
+def test_employee_profile_edit_rejects_future_effective_date(client):
+    from app.main import SessionLocal
+    from app.models import EmployeeChange
+
+    assert login(client).status_code == 303
+    with SessionLocal.begin() as db:
+        employee = Employee(
+            code="MY-FUTURE-EFFECTIVE-01",
+            full_name="Future Effective Test",
+            department_id=client.test_department_id,
+            position="Test Position",
+            hire_date=date(2024, 1, 1),
+            status="active",
+            basic_salary=Decimal("5000.00"),
+            daily_hours=Decimal("8.00"),
+        )
+        db.add(employee)
+        db.flush()
+        employee_id = employee.id
+
+    token = csrf_from(client.get("/employees"))
+    response = client.post(
+        f"/employees/{employee_id}/edit",
+        data={
+            "csrf_token": token,
+            "full_name": "Future Effective Test Updated",
+            "national_id": "",
+            "phone": "",
+            "address": "",
+            "department_id": str(client.test_department_id),
+            "branch_id": "",
+            "position": "Test Position",
+            "basic_salary": "7000.00",
+            "daily_hours": "8.00",
+            "fingerprint_id": "",
+            "effective_date": "2099-01-01",
+            "reason": "Future date must not change current employee values early",
+        },
+        follow_redirects=False,
+    )
+    assert response.status_code == 400
+    with SessionLocal() as db:
+        employee = db.get(Employee, employee_id)
+        assert employee.basic_salary == Decimal("5000.00")
+        assert employee.full_name == "Future Effective Test"
+        assert db.query(EmployeeChange).filter_by(employee_id=employee_id).count() == 0
+
+
 def test_employee_edit_rejects_branch_from_another_department(client):
     from app.main import SessionLocal
     from app.models import Branch

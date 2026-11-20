@@ -21,6 +21,7 @@ from app.models import (
     AuditLog,
     Department,
     Employee,
+    EmployeeChange,
     EmployeeCodeCounter,
     EmployeeServicePeriod,
     PayrollItem,
@@ -227,6 +228,60 @@ def create_test_payroll_run(client):
     )
     assert response.status_code == 303
     return int(response.headers["location"].rsplit("/", 1)[1])
+
+
+def test_payroll_uses_compensation_effective_at_month_start(payroll_client):
+    client = payroll_client
+    login(client)
+    with client.test_session_factory.begin() as db:
+        employee = db.get(Employee, client.test_employee_id)
+        employee.basic_salary = Decimal("12000.00")
+        employee.daily_hours = Decimal("10.00")
+        db.add_all([
+            EmployeeChange(
+                employee_id=employee.id, field_name="basic_salary",
+                old_value="9000.00", new_value="12000.00",
+                effective_date=date(2026, 11, 1), reason="Future-effective salary update",
+            ),
+            EmployeeChange(
+                employee_id=employee.id, field_name="daily_hours",
+                old_value="8.00", new_value="10.00",
+                effective_date=date(2026, 11, 1), reason="Future-effective hours update",
+            ),
+        ])
+
+    run_id = create_test_payroll_run(client)
+    with client.test_session_factory() as db:
+        item = db.scalar(select(PayrollItem).where(PayrollItem.payroll_run_id == run_id))
+        assert item.salary_basis == Decimal("9000.00")
+        assert item.daily_hours == Decimal("8.00")
+        assert item.base_salary == Decimal("9000.00")
+        assert item.lateness_deduction == Decimal("18.75")
+
+
+def test_payroll_blocks_mid_month_salary_or_hours_change_until_policy_is_defined(payroll_client):
+    client = payroll_client
+    login(client)
+    with client.test_session_factory.begin() as db:
+        employee = db.get(Employee, client.test_employee_id)
+        employee.basic_salary = Decimal("12000.00")
+        db.add(EmployeeChange(
+            employee_id=employee.id, field_name="basic_salary",
+            old_value="9000.00", new_value="12000.00",
+            effective_date=date(2026, 10, 16),
+            reason="Mid-month salary change requires explicit proration policy",
+        ))
+
+    token = csrf(client.get("/payroll"))
+    response = client.post(
+        "/payroll",
+        data={"csrf_token": token, "year": "2026", "month": "10"},
+        follow_redirects=False,
+    )
+    assert response.status_code == 303
+    assert "error=create" in response.headers["location"]
+    with client.test_session_factory() as db:
+        assert db.scalars(select(PayrollRun)).all() == []
 
 
 

@@ -2333,6 +2333,11 @@ def edit_employee(
         raise HTTPException(status_code=400, detail="بيانات الراتب أو ساعات العمل غير صحيحة.")
     if probation_start_date and probation_end_date and probation_end_date < probation_start_date:
         raise HTTPException(status_code=400, detail="نهاية فترة الاختبار لا يمكن أن تسبق بدايتها.")
+    if effective_date > date.today():
+        raise HTTPException(
+            status_code=400,
+            detail="تاريخ سريان تعديل بيانات الموظف لا يمكن أن يكون في المستقبل.",
+        )
 
     with SessionLocal.begin() as db:
         employee = db.get(Employee, employee_id)
@@ -2505,6 +2510,11 @@ def transfer_employee(
     reason = reason.strip()
     if not reason:
         raise HTTPException(status_code=400, detail="سبب النقل مطلوب.")
+    if effective_date > date.today():
+        raise HTTPException(
+            status_code=400,
+            detail="تاريخ سريان نقل الموظف لا يمكن أن يكون في المستقبل.",
+        )
     with SessionLocal.begin() as db:
         employee = db.get(Employee, employee_id)
         if employee is None:
