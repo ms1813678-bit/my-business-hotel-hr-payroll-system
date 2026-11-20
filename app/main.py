@@ -169,20 +169,20 @@ templates = Jinja2Templates(directory="app/templates")
 
 from app.i18n import translate_html
 
+SUPPORTED_LANGUAGES = {"ar", "en", "zh"}
+
 @app.middleware("http")
 async def language_middleware(request: Request, call_next):
     language = request.cookies.get("my_hr_language", "ar")
-    if language not in {"ar", "en"}:
+    if language not in SUPPORTED_LANGUAGES:
         language = "ar"
     request.state.language = language
     response = await call_next(request)
     if response.media_type == "text/html" and hasattr(response, "body"):
-        body = response.body
-        if language == "en":
-            body = translate_html(body.decode("utf-8")).encode("utf-8")
+        body = translate_html(response.body.decode("utf-8"), language).encode("utf-8")
         headers = dict(response.headers)
         headers.pop("content-length", None)
-        headers["content-language"] = language
+        headers["content-language"] = {"ar": "ar", "en": "en", "zh": "zh-CN"}[language]
         response = Response(
             content=body,
             status_code=response.status_code,
@@ -195,7 +195,7 @@ async def language_middleware(request: Request, call_next):
 
 @app.get("/language/{language}")
 def set_language(language: str, request: Request):
-    if language not in {"ar", "en"}:
+    if language not in SUPPORTED_LANGUAGES:
         raise HTTPException(status_code=404, detail="Unsupported language")
     referer = request.headers.get("referer", "/")
     destination = referer if referer.startswith("/") and not referer.startswith("//") else "/"
