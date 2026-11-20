@@ -179,7 +179,8 @@ async def language_middleware(request: Request, call_next):
         language = "ar"
     request.state.language = language
     response = await call_next(request)
-    if response.media_type == "text/html" and hasattr(response, "body"):
+    content_type = response.headers.get("content-type", "")
+    if content_type.lower().startswith("text/html") and hasattr(response, "body"):
         body = translate_html(response.body.decode("utf-8"), language).encode("utf-8")
         headers = dict(response.headers)
         headers.pop("content-length", None)
