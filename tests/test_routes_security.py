@@ -1703,3 +1703,32 @@ def test_language_switch_keeps_safe_same_origin_page_and_query(client):
     )
     assert response.status_code == 303
     assert response.headers["location"] == "/login?from=language"
+
+
+
+@pytest.mark.parametrize(
+    ("language", "html_lang", "direction", "content_language", "navigation_label"),
+    [
+        ("ar", "ar", "rtl", "ar", "لوحة التحكم"),
+        ("en", "en", "ltr", "en", "Dashboard"),
+        ("zh", "zh-CN", "ltr", "zh-CN", "控制面板"),
+    ],
+)
+def test_all_main_html_pages_render_in_each_supported_language(
+    client, language, html_lang, direction, content_language, navigation_label
+):
+    assert login(client).status_code == 303
+    client.cookies.set("my_hr_language", language)
+
+    paths = [
+        "/", "/ai", "/security-roster", "/attendance/import",
+        "/attendance/reconcile", "/attendance/review", "/attendance/months",
+        "/leave", "/advances", "/staff-actions", "/payroll", "/reports",
+        "/settings/backup", "/employees",
+    ]
+    for path in paths:
+        response = client.get(path, headers={"accept": "text/html"})
+        assert response.status_code == 200, f"{language} {path}: {response.status_code}"
+        assert response.headers["content-language"] == content_language
+        assert f'<html lang="{html_lang}" dir="{direction}">' in response.text
+        assert navigation_label in response.text, f"Missing translated navigation on {path}"
