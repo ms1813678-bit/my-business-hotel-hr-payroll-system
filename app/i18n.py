@@ -609,6 +609,19 @@ ZH.update({
   "الاتصال بالنموذج مسموح فقط على الجهاز المحلي.": "仅允许连接本机上的模型。"
 })
 
+
+EN.update({
+  "النموذج:": "Model:",
+  "— الاتصال بالنموذج مقصور على الجهاز المحلي.": "— model connections are restricted to this local device.",
+  "مثال: نفذ: اعتمد مسير الرواتب رقم 3": "Example: Execute: approve payroll run number 3"
+})
+
+ZH.update({
+  "النموذج:": "模型：",
+  "— الاتصال بالنموذج مقصور على الجهاز المحلي.": "— 模型连接仅限于本机。",
+  "مثال: نفذ: اعتمد مسير الرواتب رقم 3": "示例：执行：批准第 3 号工资批次"
+})
+
 LANGUAGES = {"ar": "العربية", "en": "English", "zh": "中文"}
 
 def _translate_value(value: str, language: str) -> str:
