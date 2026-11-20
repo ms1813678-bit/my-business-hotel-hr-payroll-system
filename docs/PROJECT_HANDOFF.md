@@ -17,15 +17,24 @@
 8. Attendance remains evidence-first: source files are retained, daily records require HR approval, and monthly approval requires both source imports and explicit coverage confirmation.
 9. Employee codes are never reused. Rehire preserves the code but creates a new service period.
 
+## Latest automated verification (2026-11-20)
+- Branch: `feature/bilingual-ui-rtl-ltr`.
+- Verified commit: `acadd76c4ed88767b1c6f9d06823e5986a2a50bf`.
+- GitHub Actions run: [44733073314](https://github.com/ms1813678-bit/my-business-hotel-hr-payroll-system/actions/runs/44733073314) — completed successfully.
+- Linux + PostgreSQL 16: 322 passed, 16 warnings, zero failures.
+- Windows runner: 315 passed, 1 warning, zero failures.
+- PowerShell syntax checks: `setup.ps1`, `start.ps1`, `install_backup_tasks.ps1` passed.
+- This proves CI compatibility only. It does not replace installation and backup/restore acceptance on the hotel PC.
+
 ## Final acceptance gates
 1. Full automated test suite passes on the final-acceptance branch, including PostgreSQL migration/concurrency tests.
 2. Windows runner installation/compatibility passes.
-3. Real Windows 11 + PostgreSQL installation is executed on the hotel target PC.
+3. Real Windows 10 or Windows 11 + PostgreSQL installation is executed on the hotel target PC.
 4. Backup creation, integrity validation, restore, and rollback behavior are executed against the target PostgreSQL environment and backup drive.
 5. Synthetic end-to-end business flow passes: employee/service period -> attendance -> security roster -> leave -> advance/installment ledger -> sanctions/rewards -> payroll -> payment -> reports -> backup/restore.
 6. AI assistant approval-gate tests pass and the application remains usable with local AI unavailable.
 7. Arabic/English/Simplified Chinese translations and RTL/LTR UI regression are checked.
-8. Only after all gates pass may this branch be merged to main with explicit owner approval.
+8. Only after all gates pass may `feature/bilingual-ui-rtl-ltr` be merged to `main` with explicit owner approval.
 
 ## Verification notes
 - PostgreSQL migration tests are in tests/test_postgres_migrations.py.
