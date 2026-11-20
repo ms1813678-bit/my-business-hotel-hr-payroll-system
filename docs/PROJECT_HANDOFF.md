@@ -17,10 +17,10 @@
 8. Attendance remains evidence-first: source files are retained, daily records require HR approval, and monthly approval requires both source imports and explicit coverage confirmation.
 9. Employee codes are never reused. Rehire preserves the code but creates a new service period.
 
-## Latest automated verification (2026-11-20)
+## Latest automated verification after repository cleanup (2026-11-20)
 - Branch: `feature/bilingual-ui-rtl-ltr`.
-- Verified commit: `acadd76c4ed88767b1c6f9d06823e5986a2a50bf`.
-- GitHub Actions run: [44733073314](https://github.com/ms1813678-bit/my-business-hotel-hr-payroll-system/actions/runs/44733073314) — completed successfully.
+- Verified commit: `7bc1ac97e9093363145d5fd23ece901da69550d5`.
+- GitHub Actions run: [44735532293](https://github.com/ms1813678-bit/my-business-hotel-hr-payroll-system/actions/runs/44735532293) — completed successfully.
 - Linux + PostgreSQL 16: 322 passed, 16 warnings, zero failures.
 - Windows runner: 315 passed, 1 warning, zero failures.
 - PowerShell syntax checks: `setup.ps1`, `start.ps1`, `install_backup_tasks.ps1` passed.
@@ -35,6 +35,12 @@
 6. AI assistant approval-gate tests pass and the application remains usable with local AI unavailable.
 7. Arabic/English/Simplified Chinese translations and RTL/LTR UI regression are checked.
 8. Only after all gates pass may `feature/bilingual-ui-rtl-ltr` be merged to `main` with explicit owner approval.
+
+## Repository hygiene verification
+- The new repository contains no tracked `.env`, database, spreadsheet, PDF, backup archive, private key, local data, or `var/` files.
+- `.gitignore` excludes `.env`, `data/`, `backups/`, `var/`, virtual environments, build output, caches, logs, and temporary files.
+- The stale `.github/workflows/release-ci.yml` file and old `tests/test_monthly_report_schedule.py` name were removed from this repository; the manual-report CLI test remains under `tests/test_manual_report_cli.py`.
+- The old repository was left unchanged as the historical source; no source files were removed from it.
 
 ## Verification notes
 - PostgreSQL migration tests are in tests/test_postgres_migrations.py.

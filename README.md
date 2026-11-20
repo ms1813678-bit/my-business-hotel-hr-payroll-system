@@ -20,7 +20,7 @@ Do **not** enter real employee or payroll data until Windows installation, backu
 - Manual Excel/PDF reports with date range and employee scope; local file save only.
 - Optional local AI assistant (available in the UI when enabled). If the local model is temporarily unavailable, core HR/payroll continues. Write actions require explicit administrator approval. Security roster vs fingerprint comparison is available as a read-only review report.
 - Arabic / English / Simplified Chinese UI with RTL Arabic and LTR English/Chinese layouts, plus live dashboard metrics.
-- Final acceptance CI on commit `acadd76c4ed88767b1c6f9d06823e5986a2a50bf` completed successfully: Linux/PostgreSQL test suite 322 passed (16 warnings), Windows runner test suite 315 passed (1 warning), and all three PowerShell scripts passed syntax checks. [View workflow run](https://github.com/ms1813678-bit/my-business-hotel-hr-payroll-system/actions/runs/44733073314).
+- Final acceptance CI on the cleaned acceptance branch commit `7bc1ac97e9093363145d5fd23ece901da69550d5` completed successfully: Linux/PostgreSQL test suite 322 passed (16 warnings), Windows runner test suite 315 passed (1 warning), and all three PowerShell scripts passed syntax checks. [View workflow run](https://github.com/ms1813678-bit/my-business-hotel-hr-payroll-system/actions/runs/44735532293).
 
 ### Still required before production release
 

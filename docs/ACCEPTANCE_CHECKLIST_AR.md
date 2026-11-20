@@ -5,11 +5,11 @@
 ## الحالة الحالية
 
 - فرع العمل: `feature/bilingual-ui-rtl-ltr`
-- آخر نسخة تم التحقق منها آليًا: `acadd76c4ed88767b1c6f9d06823e5986a2a50bf`
+- آخر نسخة تم التحقق منها آليًا: `7bc1ac97e9093363145d5fd23ece901da69550d5`
 - اختبارات Linux + PostgreSQL 16: **322 ناجحًا، 16 تحذيرًا، صفر فشل**.
 - اختبارات Windows runner: **315 ناجحًا، تحذير واحد، صفر فشل**.
 - فحص صياغة PowerShell: ملفات الإعداد والتشغيل والنسخ الاحتياطي نجحت.
-- رابط نتيجة CI: https://github.com/ms1813678-bit/my-business-hotel-hr-payroll-system/actions/runs/44733073314
+- رابط نتيجة CI: https://github.com/ms1813678-bit/my-business-hotel-hr-payroll-system/actions/runs/44735532293
 
 > نجاح CI لا يعني أن التثبيت والاستعادة جُرّبا على جهاز الفندق. هذان الاختباران ما زالا مطلوبين.
 
