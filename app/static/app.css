@@ -577,3 +577,10 @@ html[lang="zh-CN"] { --font: "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", 
 .language-switch a { display: inline-flex; align-items: center; justify-content: center; min-height: 32px; padding: 4px 9px; border: 1px solid rgba(148,163,184,.35); border-radius: 8px; color: inherit; font-size: 12px; font-weight: 700; }
 .language-switch a:hover { background: rgba(148,163,184,.12); text-decoration: none; }
 .login-language { justify-content: center; margin-bottom: 8px; color: var(--text-muted); }
+
+html[dir="ltr"] input,
+html[dir="ltr"] select,
+html[dir="ltr"] textarea {
+  direction: ltr;
+  text-align: start;
+}
