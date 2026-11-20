@@ -168,7 +168,7 @@ EN = {
 "مسار القرص الخارجي / External drive folder":"External Drive Folder","حفظ المسار / Save location":"Save Location",
 "المسار الحالي:":"Current Path:","لم يتم تحديد قرص النسخ الاحتياطي بعد.":"No backup drive has been selected.",
 "إنشاء نسخة الآن / Create backup now":"Create Backup Now","إنشاء والتحقق / Create and verify":"Create and Verify",
-"نوع النسخة":"Backup Type","يدوية / Manual":"Manual","يومية / Daily":"Daily","أسبوعية / Weekly":"Weekly","ربع سنوية / Quarterly",
+"نوع النسخة":"Backup Type","يدوية / Manual":"Manual","يومية / Daily":"Daily","أسبوعية / Weekly":"Weekly","ربع سنوية / Quarterly":"Quarterly",
 "سجل النسخ / Backup history":"Backup History","الحجم":"Size","المسار":"Path","التحقق":"Verification",
 "سبب الاستعادة / Restore reason":"Restore Reason","اكتب RESTORE للتأكيد":"Type RESTORE to Confirm",
 "استعادة هذه النسخة / Restore this backup":"Restore This Backup","لا توجد نسخ احتياطية مسجلة.":"No backups recorded.",
