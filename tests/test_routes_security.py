@@ -1672,3 +1672,34 @@ def test_language_switch_supports_english_and_arabic_default(client):
 def test_language_switch_rejects_unsupported_locale(client):
     response = client.get("/language/fr", follow_redirects=False)
     assert response.status_code == 404
+
+
+def test_login_post_and_csrf_continue_to_work_after_language_switch(client):
+    client.get("/language/en", follow_redirects=False)
+    page = client.get("/login")
+    assert page.headers["content-language"] == "en"
+    token = csrf_from(page)
+    response = client.post(
+        "/login",
+        data={
+            "username": "integration-admin",
+            "password": "Integration-Test-Password-123!",
+            "csrf_token": token,
+        },
+        follow_redirects=False,
+    )
+    assert response.status_code == 303
+    dashboard = client.get("/")
+    assert dashboard.status_code == 200
+    assert dashboard.headers["content-language"] == "en"
+    assert "Dashboard" in dashboard.text
+
+
+def test_language_switch_keeps_safe_same_origin_page_and_query(client):
+    response = client.get(
+        "/language/zh",
+        headers={"referer": "http://testserver/login?from=language"},
+        follow_redirects=False,
+    )
+    assert response.status_code == 303
+    assert response.headers["location"] == "/login?from=language"
