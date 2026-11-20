@@ -642,6 +642,17 @@ ZH.update({
   "مثال: study": "示例：study"
 })
 
+
+EN.update({
+  "مثال: E:\\M.Y. Business Hotel Backups": "Example: E:\\M.Y. Business Hotel Backups",
+  "مثال: استعادة بعد تلف قاعدة البيانات": "Example: restore after database corruption"
+})
+
+ZH.update({
+  "مثال: E:\\M.Y. Business Hotel Backups": "示例：E:\\M.Y. Business Hotel Backups",
+  "مثال: استعادة بعد تلف قاعدة البيانات": "示例：数据库损坏后恢复"
+})
+
 LANGUAGES = {"ar": "العربية", "en": "English", "zh": "中文"}
 
 def _translate_value(value: str, language: str) -> str:
