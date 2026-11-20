@@ -567,3 +567,13 @@ code, .code-ltr {
   .meta-item { border-inline-end: none !important; }
   .meta-item:last-child { border-bottom: none; }
 }
+
+
+/* Locale-aware layout: keep the established Arabic layout; mirror for LTR locales. */
+html[dir="rtl"] { direction: rtl; text-align: start; }
+html[dir="ltr"] { direction: ltr; text-align: start; }
+html[lang="zh-CN"] { --font: "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", Arial, sans-serif; }
+.language-switch { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 8px 12px 14px; }
+.language-switch a { display: inline-flex; align-items: center; justify-content: center; min-height: 32px; padding: 4px 9px; border: 1px solid rgba(148,163,184,.35); border-radius: 8px; color: inherit; font-size: 12px; font-weight: 700; }
+.language-switch a:hover { background: rgba(148,163,184,.12); text-decoration: none; }
+.login-language { justify-content: center; margin-bottom: 8px; color: var(--text-muted); }
