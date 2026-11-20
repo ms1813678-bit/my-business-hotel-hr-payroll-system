@@ -5,11 +5,12 @@
 ## الحالة الحالية
 
 - فرع العمل: `feature/bilingual-ui-rtl-ltr`
-- آخر نسخة تم التحقق منها آليًا: `7bc1ac97e9093363145d5fd23ece901da69550d5`
+- آخر نسخة تم التحقق منها آليًا: `eb027b46776461c4c1dc8e6bfea1199da083408a`
 - اختبارات Linux + PostgreSQL 16: **322 ناجحًا، 16 تحذيرًا، صفر فشل**.
 - اختبارات Windows runner: **315 ناجحًا، تحذير واحد، صفر فشل**.
 - فحص صياغة PowerShell: ملفات الإعداد والتشغيل والنسخ الاحتياطي نجحت.
-- رابط نتيجة CI: https://github.com/ms1813678-bit/my-business-hotel-hr-payroll-system/actions/runs/44735532293
+- تمت إضافة تحقق يمنع الاتصال بقاعدة PostgreSQL خارج جهاز الفندق.
+- رابط نتيجة CI: https://github.com/ms1813678-bit/my-business-hotel-hr-payroll-system/actions/runs/44737576171
 
 > نجاح CI لا يعني أن التثبيت والاستعادة جُرّبا على جهاز الفندق. هذان الاختباران ما زالا مطلوبين.
 

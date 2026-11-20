@@ -17,13 +17,14 @@
 8. Attendance remains evidence-first: source files are retained, daily records require HR approval, and monthly approval requires both source imports and explicit coverage confirmation.
 9. Employee codes are never reused. Rehire preserves the code but creates a new service period.
 
-## Latest automated verification after repository cleanup (2026-11-20)
+## Latest automated verification after local-database security guard (2026-11-20)
 - Branch: `feature/bilingual-ui-rtl-ltr`.
-- Verified commit: `7bc1ac97e9093363145d5fd23ece901da69550d5`.
-- GitHub Actions run: [44735532293](https://github.com/ms1813678-bit/my-business-hotel-hr-payroll-system/actions/runs/44735532293) — completed successfully.
-- Linux + PostgreSQL 16: 322 passed, 16 warnings, zero failures.
-- Windows runner: 315 passed, 1 warning, zero failures.
+- Verified commit: `eb027b46776461c4c1dc8e6bfea1199da083408a`.
+- GitHub Actions run: [44737576171](https://github.com/ms1813678-bit/my-business-hotel-hr-payroll-system/actions/runs/44737576171) — completed successfully.
+- Linux + PostgreSQL 16: 330 passed, 16 warnings, zero failures.
+- Windows runner: 323 passed, 1 warning, zero failures.
 - PowerShell syntax checks: `setup.ps1`, `start.ps1`, `install_backup_tasks.ps1` passed.
+- Added application-level and Windows setup validation to reject remote PostgreSQL hosts; only localhost, 127.0.0.1, and ::1 are accepted.
 - This proves CI compatibility only. It does not replace installation and backup/restore acceptance on the hotel PC.
 
 ## Final acceptance gates

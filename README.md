@@ -18,9 +18,10 @@ Do **not** enter real employee or payroll data until Windows installation, backu
 - Sanctions and rewards with manual amounts and payroll-month assignment.
 - Monthly payroll runs, snapshots, overtime approval gate, close/reopen, payment ledger.
 - Manual Excel/PDF reports with date range and employee scope; local file save only.
+- PostgreSQL connection guard: application startup accepts loopback database hosts only (localhost, 127.0.0.1, ::1) and rejects remote database hosts.
 - Optional local AI assistant (available in the UI when enabled). If the local model is temporarily unavailable, core HR/payroll continues. Write actions require explicit administrator approval. Security roster vs fingerprint comparison is available as a read-only review report.
 - Arabic / English / Simplified Chinese UI with RTL Arabic and LTR English/Chinese layouts, plus live dashboard metrics.
-- Final acceptance CI on the cleaned acceptance branch commit `7bc1ac97e9093363145d5fd23ece901da69550d5` completed successfully: Linux/PostgreSQL test suite 322 passed (16 warnings), Windows runner test suite 315 passed (1 warning), and all three PowerShell scripts passed syntax checks. [View workflow run](https://github.com/ms1813678-bit/my-business-hotel-hr-payroll-system/actions/runs/44735532293).
+- Latest security validation on commit `eb027b46776461c4c1dc8e6bfea1199da083408a` completed successfully: Linux/PostgreSQL test suite 330 passed (16 warnings), Windows runner test suite 323 passed (1 warning), and all three PowerShell scripts passed syntax checks. [View workflow run](https://github.com/ms1813678-bit/my-business-hotel-hr-payroll-system/actions/runs/44737576171).
 
 ### Still required before production release
 
