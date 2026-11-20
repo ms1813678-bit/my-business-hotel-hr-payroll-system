@@ -1,7 +1,6 @@
 """Offline UI translation and document direction handling.
 
-Only server-authored HTML text and selected presentation attributes are translated.
-Form values, employee names and other database/user-provided content are never modified.
+Only known interface labels and selected presentation attributes are translated. Form values and input data are left untouched; dynamic text is translated only when it exactly matches a catalog entry.
 """
 from __future__ import annotations
 
@@ -417,7 +416,7 @@ ZH = {
 "partially_paid":"部分支付","paid":"已支付",
 "إدارة السلف": "预支工资管理",
 "تسجيل طلب سلفة / New advance request": "提交预支工资申请",
-"تُقبل الطلبات من يوم 15 إلى يوم 22 من الشهر فقط. السلفة الشهرية العادية فقط تخضع لحد 25% من الراتب الأساسي. السلفة المقسطة مستقلة عن هذا الحد ويمكن أن تتجاوز الراتب الشهري، ويحدد جدولها عدد الأقساط. شهر الاستحقاق المحاسبي هو شهر الطلب، ويُدفع الراتب في اليوم الخامس من الشهر التالي。": "申请仅在每月15日至22日受理。只有普通月度预支受基本工资25%的上限限制。分期预支不受此限制，金额可以超过月薪；分期计划决定还款期数。会计归属月份为申请月份，工资于次月5日发放。",
+"تُقبل الطلبات من يوم 15 إلى يوم 22 من الشهر فقط. السلفة الشهرية العادية فقط تخضع لحد 25% من الراتب الأساسي. السلفة المقسطة مستقلة عن هذا الحد ويمكن أن تتجاوز الراتب الشهري، ويحدد جدولها عدد الأقساط. شهر الاستحقاق المحاسبي هو شهر الطلب، ويُدفع الراتب في اليوم الخامس من الشهر التالي.": "申请仅在每月15日至22日受理。只有普通月度预支受基本工资25%的上限限制。分期预支不受此限制，金额可以超过月薪；分期计划决定还款期数。会计归属月份为申请月份，工资于次月5日发放。",
 "تاريخ الطلب / Request date": "申请日期",
 "نوع السلفة / Advance type": "预支类型",
 "سلفة شهرية عادية — حد 25% من الأساسي": "普通月度预支 — 基本工资的25%上限",
