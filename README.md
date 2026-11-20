@@ -19,7 +19,7 @@ Do **not** enter real employee or payroll data until Windows installation, backu
 - Monthly payroll runs, snapshots, overtime approval gate, close/reopen, payment ledger.
 - Manual Excel/PDF reports with date range and employee scope; local file save only.
 - Local AI assistant as a **core product feature** (always present in the UI). If the local model is temporarily unavailable, core HR/payroll continues. Write actions require explicit administrator approval. Security roster vs fingerprint comparison is available as a read-only review report.
-- RTL Arabic admin UI shell with live dashboard metrics.
+- Arabic / English / Simplified Chinese UI with RTL Arabic and LTR English/Chinese layouts, plus live dashboard metrics.
 - Final acceptance CI includes PostgreSQL 16 migration/concurrency tests and a Windows runner compatibility job; the latest result must be confirmed on the current commit before release.
 
 ### Still required before production release

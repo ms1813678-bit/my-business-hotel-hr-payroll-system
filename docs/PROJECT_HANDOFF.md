@@ -1,8 +1,8 @@
 # Project handoff and current decisions
 
 ## Current integration branch
-- Branch: integration/final-acceptance-v1
-- Source baseline: integration/continue-safe-v1
+- Branch: feature/bilingual-ui-rtl-ltr
+- Source baseline: main at daeed7a50e272cf155e4797bca07c84276afa237
 - Target branch: main
 - This is the controlled final-acceptance track. Do not merge it to main until all acceptance gates are green and the owner explicitly approves the merge.
 
@@ -24,7 +24,7 @@
 4. Backup creation, integrity validation, restore, and rollback behavior are executed against the target PostgreSQL environment and backup drive.
 5. Synthetic end-to-end business flow passes: employee/service period -> attendance -> security roster -> leave -> advance/installment ledger -> sanctions/rewards -> payroll -> payment -> reports -> backup/restore.
 6. AI assistant approval-gate tests pass and the application remains usable with local AI unavailable.
-7. Arabic/English and RTL UI regression is checked.
+7. Arabic/English/Simplified Chinese translations and RTL/LTR UI regression are checked.
 8. Only after all gates pass may this branch be merged to main with explicit owner approval.
 
 ## Verification notes

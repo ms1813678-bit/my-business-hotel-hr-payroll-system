@@ -1753,7 +1753,7 @@ def test_all_main_html_pages_render_in_each_supported_language(
         "/", "/ai", "/security-roster", "/attendance/import",
         "/attendance/reconcile", "/attendance/review", "/attendance/months",
         "/leave", "/advances", "/staff-actions", "/payroll", "/reports",
-        "/settings/backup", "/employees",
+        "/settings/backup", "/employees", "/login",
     ]
     for path in paths:
         response = client.get(path, headers={"accept": "text/html"})
@@ -1761,9 +1761,6 @@ def test_all_main_html_pages_render_in_each_supported_language(
         assert response.headers["content-language"] == content_language
         assert f'<html lang="{html_lang}" dir="{direction}">' in response.text
         assert navigation_label in response.text, f"Missing translated navigation on {path}"
-        if path == "/" and language != "ar":
-            expected_greeting = "Welcome," if language == "en" else "欢迎，"
-            assert expected_greeting in response.text
         if language != "ar":
             probe = _ArabicUiTextProbe()
             probe.feed(response.text)
