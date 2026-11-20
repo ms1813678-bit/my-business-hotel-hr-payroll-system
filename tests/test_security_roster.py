@@ -118,13 +118,16 @@ def test_five_guards_sharing_shifts_are_accepted_when_coverage_is_complete():
     assert {item["duration_hours"] for item in result["assignments"]} == {8}
 
 
-def test_five_person_roster_with_only_two_working_uses_12_hour_model():
+def test_five_active_guards_with_only_two_working_cannot_fall_back_to_12_hour_model():
     result = build_security_day_proposal(
         {"a": "08:00", "b": "20:00", "c": "OFF", "d": "OFF", "e": "OFF"},
         PATTERNS,
     )
-    assert result["status"] == "ready_for_admin_review"
-    assert _ids(result) == [("a", 12, 1), ("b", 12, 2)]
+    assert result["status"] == "needs_review"
+    assert result["assignments"] == []
+    assert result["issues"] == [
+        "security_shifts_must_cover_24_hours_without_gaps_or_overlaps"
+    ]
 
 
 def test_five_person_roster_with_three_working_uses_8_hour_model():
